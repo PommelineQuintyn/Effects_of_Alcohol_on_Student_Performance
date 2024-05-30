@@ -2,6 +2,7 @@
 # The dataset is a CSV-file and can be retrieved on https://www.kaggle.com/datasets/joshuanaude/effects-of-alcohol-on-student-performance. 
 
 ### PREPARE THE DATASET TO PERFORM THE ANALYSES ###
+# Note that we added the preprocessed dataframe (data.rds) in the GitHub repository. You can skip this script and download it to perform the analyses without completing this script. 
 ## Install and load all packages
 install.packages("car")     # For Anova function
 install.packages("ggplot2") # For plotting
@@ -82,3 +83,5 @@ saveRDS(data, file = "/Users/marievandewalle/Documents/PSYCHOLOGIE/Master/ma 2/C
 
 # get the dataframe again
 data <- readRDS("/Users/marievandewalle/Documents/PSYCHOLOGIE/Master/ma 2/CSAED/data.rds") #personalize working directory
+
+
