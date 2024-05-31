@@ -4,9 +4,42 @@
 
 ### QUESTION 2: 
 
-### QUESTION 3:
+### QUESTION 3: Amandine: The impact of alcohol consumption (Drinks_Per_Night) on failed modules (Failed_Modules)
+# Chi square test
+# Create contingency tables
+table_failed <- table(data$Drinks_Per_Night, data$Modules_Failed)
 
-### QUESTION 4:
+
+# Perform Chi-Square Test for failed modules
+chi_square_failed <- chisq.test(table_failed) # This gives a warning message
+print(chi_square_failed) # p=0.079
+
+# Chi square test with Monte Carlo-simulation to solve the warning message
+chi_square_failed_sim <- chisq.test(table_failed, simulate.p.value = TRUE, B = 2000)
+
+# Watch results
+print(table_failed)
+print(chi_square_failed_sim)
+
+### QUESTION 4: Amandine: The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
+# Chi square test
+# Create contingency tables
+table_drinks_parental <- table(data$Drinks_Per_Night, data$Parental_Relationship)
+
+# Frequency table
+print(table_drinks_parental)
+
+# Perform Chi-Square Test
+chi_square_test <- chisq.test(table_drinks_parental)
+
+# Watch results
+print(chi_square_test) #0.028
+
+# Chi square test with Monte Carlo-simulation to solve the warning message
+chi_square_test_sim <- chisq.test(table_drinks_parental, simulate.p.value = TRUE, B = 2000)
+
+# Watch results
+print(chi_square_test_sim)
 
 ### QUESTION 5: The impact of going out (Party_Frequency) on academic performance (Matric_GPA)
 
