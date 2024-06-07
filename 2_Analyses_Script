@@ -1,5 +1,109 @@
 ##### PERFORM THE ANALYSES #####
 
+############################
+### Descriptive analysis ###
+############################
+# Load necessary packages
+library(ggplot2)
+library(dplyr)
+
+
+# Hypothesis 1: Frequency of Going Out and Academic Performance
+# 1. Descriptive statistics
+summary(data$Party_Frequency)
+summary(data$Matric_GPA)
+
+# 2. Mean GPA by party frequency
+party_gpa_summary <- data %>%
+  group_by(Party_Frequency) %>%
+  summarise(mean_GPA = mean(Matric_GPA, na.rm = TRUE), median_GPA = median(Matric_GPA, na.rm = TRUE))
+
+print(party_gpa_summary)
+
+# Hypothesis 2: Romantic Relationship and Alcohol Consumption
+# 1. Percentage of students in a romantic relationship
+relationship_table <- table(data$In_Romantic_Relationship)
+print(relationship_table)
+
+# 2. Distribution of alcohol consumption by relationship status
+drinks_relationship_table <- table(data$Drinks_Per_Night, data$In_Romantic_Relationship)
+print(drinks_relationship_table)
+
+# Calculate column totals
+col_totals <- colSums(drinks_relationship_table)
+
+# Convert frequencies to percentages
+drinks_relationship_percent <- sweep(drinks_relationship_table, 2, col_totals, FUN = "/") * 100
+print(drinks_relationship_percent)
+
+# Hypothesis 3: Alcohol Consumption and Failed Modules
+# Create a summary table of the number of people per number of failed modules
+failed_modules_summary <- data %>%
+  group_by(Modules_Failed) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / nrow(data)) * 100)
+
+print(failed_modules_summary)
+
+# Distribution of failed modules by alcohol consumption level
+fails_distribution_table <- table(data$Drinks_Per_Night, data$Modules_Failed)
+print(fails_distribution_table)
+
+# Hypothesis 4: Parental Approval and Alcohol Consumption
+# Percentage of students with parental approval of alcohol consumption
+approval_table <- table(data$Parents_Approve_Alcohol)
+print(approval_table)
+
+# Distribution of alcohol consumption by approval status
+drinks_approval_table <- table(data$Drinks_Per_Night, data$Parents_Approve_Alcohol)
+print(drinks_approval_table)
+
+# Calculate column totals
+col_totals <- colSums(drinks_approval_table)
+
+# Convert frequencies to percentages
+drinks_approval_percent <- sweep(drinks_approval_table, 2, col_totals, FUN = "/") * 100
+print(drinks_approval_percent)
+
+# Hypothesis 5: Parental Relationship and Alcohol Consumption
+# Create the contingency table
+drinks_parental_table <- table(data$Drinks_Per_Night, data$Parental_Relationship)
+print(drinks_parental_table)
+
+# Calculate column totals
+col_totals <- colSums(drinks_parental_table)
+
+# Convert frequencies to percentages
+drinks_parental_percent <- sweep(drinks_parental_table, 2, col_totals, FUN = "/") * 100
+print(drinks_parental_percent)
+
+# Hypothesis 6: Role of Sex in Alcohol Consumption and Academic Performance
+# 1. Distribution of sex within the sample
+sex_distribution <- table(data$Sex)
+print(sex_distribution)
+
+# 2. Distribution of alcohol consumption by sex
+drinks_sex_table <- table(data$Drinks_Per_Night, data$Sex)
+print(drinks_sex_table)
+
+# Calculate column totals
+col_totals <- colSums(drinks_sex_table)
+
+# Convert frequencies to percentages
+drinks_sex_percent <- sweep(drinks_sex_table, 2, col_totals, FUN = "/") * 100
+print(drinks_sex_percent)
+
+# 3. Mean GPA by sex
+gpa_sex <- data %>%
+  group_by(Sex) %>%
+  summarise(mean_GPA = mean(Matric_GPA, na.rm = TRUE), median_GPA = median(Matric_GPA, na.rm = TRUE))
+
+print(gpa_sex)
+
+############################
+### Statistical analysis ###
+############################
+
 ### QUESTION 1: 
 
 ### QUESTION 2: 
