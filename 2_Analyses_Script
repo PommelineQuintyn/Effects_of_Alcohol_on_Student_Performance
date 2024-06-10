@@ -257,8 +257,14 @@ kruskal_test_freq_perf <- kruskal.test(Matric_GPA ~ Party_Frequency, data = data
 print(kruskal_test_Q1)
 # non-significant effect after taking into account the violated normality assumption
 
-### QUESTION 2: 
+### QUESTION 2: The impact of being in a romantic relationship(In_Romantic_Relationship) on alcohol consumption(Drinks_Per_Night)
+# Create a contingency table
+contingency_table <- table(data$In_Romantic_Relationship, data$Drinks_Per_Night)
+print(contingency_table)
 
+# Perform the chi-square test
+chi_square_test <- chisq.test(contingency_table)
+print(chi_square_test)
 ### QUESTION 3: The impact of alcohol consumption (Drinks_Per_Night) on failed modules (Failed_Modules)
 # Chi square test
 # Create contingency tables
