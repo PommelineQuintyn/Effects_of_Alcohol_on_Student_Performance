@@ -275,9 +275,9 @@ chi_square_failed_sim <- chisq.test(table_failed, simulate.p.value = TRUE, B = 2
 print(table_failed)
 print(chi_square_failed_sim)
 
-### QUESTION 4: Parental Relationship and Alcohol Consumption
 
-### QUESTION 5: : The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
+
+### QUESTION 4: : The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
 # Chi square test
 # Create contingency tables
 table_drinks_parental <- table(data$Drinks_Per_Night, data$Parental_Relationship)
@@ -297,7 +297,7 @@ chi_square_test_sim <- chisq.test(table_drinks_parental, simulate.p.value = TRUE
 # Watch results
 print(chi_square_test_sim)
 
-
+### QUESTION 5: Parental Relationship and Alcohol Consumption
 
 ### QUESTION 6: The impact of alcohol consumption (Drinks_Per_Night) on academic performance (Matric_GPA) in males and females (Sex)
 # Anova test
