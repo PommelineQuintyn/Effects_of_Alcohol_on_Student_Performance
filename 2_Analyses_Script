@@ -1,268 +1,21 @@
 ##### PERFORM THE ANALYSES #####
 
-############################
-### Descriptive analysis ###
-############################
-# Install and load all the necessary packages
-install.packages("ggplot2")      #for plotting
-install.packages("dplyr")        #for ... 
-install.packages("tidyverse")    #for ...
-install.packages("car")          #for anova function
-install.packages("boot")         #for bootstrapping
-library(ggplot2)
-library(dplyr)
-library(tidyverse)
-library(car)
-library(boot)
+### QUESTION 1:
 
-# QUESTION 1: Frequency of Going Out and Academic Performance
-# 1. Descriptive statistics
-summary(data$Party_Frequency)
-summary(data$Matric_GPA)
+### QUESTION 2: The impact of romantic relationship (In_Romantic_Relationship) on alcohol consumption (Drinks_Per_Night)
+# Chi square test
+# Create contingency table
+contingency_table <- table(data$In_Romantic_Relationship, data$Drinks_Per_Night)
 
-# 2. Mean GPA by party frequency
-party_gpa_summary <- data %>%
-  group_by(Party_Frequency) %>%
-  summarise(mean_GPA = mean(Matric_GPA, na.rm = TRUE), median_GPA = median(Matric_GPA, na.rm = TRUE))
-
-print(party_gpa_summary)
-
-# QUESTION 2: Romantic Relationship and Alcohol Consumption
-# 1. Percentage of students in a romantic relationship
-relationship_table <- table(data$In_Romantic_Relationship)
-print(relationship_table)
-
-# 2. Distribution of alcohol consumption by relationship status
-drinks_relationship_table <- table(data$Drinks_Per_Night, data$In_Romantic_Relationship)
-print(drinks_relationship_table)
-
-# Calculate column totals
-col_totals <- colSums(drinks_relationship_table)
-
-# Convert frequencies to percentages
-drinks_relationship_percent <- sweep(drinks_relationship_table, 2, col_totals, FUN = "/") * 100
-print(drinks_relationship_percent)
-
-# QUESTION 3: Alcohol Consumption and Failed Modules
-# Create a summary table of the number of people per number of failed modules
-failed_modules_summary <- data %>%
-  group_by(Modules_Failed) %>%
-  summarise(count = n()) %>%
-  mutate(percentage = (count / nrow(data)) * 100)
-
-print(failed_modules_summary)
-
-# Distribution of failed modules by alcohol consumption level
-fails_distribution_table <- table(data$Drinks_Per_Night, data$Modules_Failed)
-print(fails_distribution_table)
-
-# QUESTION 4: Parental Approval and Alcohol Consumption
-# Percentage of students with parental approval of alcohol consumption
-approval_table <- table(data$Parents_Approve_Alcohol)
-print(approval_table)
-
-# Distribution of alcohol consumption by approval status
-drinks_approval_table <- table(data$Drinks_Per_Night, data$Parents_Approve_Alcohol)
-print(drinks_approval_table)
-
-# Calculate column totals
-col_totals <- colSums(drinks_approval_table)
-
-# Convert frequencies to percentages
-drinks_approval_percent <- sweep(drinks_approval_table, 2, col_totals, FUN = "/") * 100
-print(drinks_approval_percent)
-
-# QUESTION 5: Parental Relationship and Alcohol Consumption
-# Create the contingency table
-drinks_parental_table <- table(data$Drinks_Per_Night, data$Parental_Relationship)
-print(drinks_parental_table)
-
-# Calculate column totals
-col_totals <- colSums(drinks_parental_table)
-
-# Convert frequencies to percentages
-drinks_parental_percent <- sweep(drinks_parental_table, 2, col_totals, FUN = "/") * 100
-print(drinks_parental_percent)
-
-#### Interpretation of significant relationship of QUESTION 5 
-# Load the necessary packages
-library(dplyr)
-library(ggplot2)
-
-# Filter out rows with NA in Parental_Relationship
-data <- data %>% filter(!is.na(Parental_Relationship))
-
-# Create the proportional bar chart
-ggplot(data, aes(x = Parental_Relationship, fill = Drinks_Per_Night)) +
-  geom_bar(position = "fill") +
-  xlab("Parental Relationship Quality") +
-  ylab("Proportion") +
-  ggtitle("Proportion of Alcohol Consumption by Parental Relationship Quality") +
-  labs(fill = "Drinks Per Night") +
-  scale_fill_discrete(labels = c("0", "1-3", "3-5", "5-8", "8+")) +
-  scale_x_discrete(labels = c("Very Close", "Close", "Fair", "Distant"))
-
-# Calculate the distribution of alcohol consumption by parental relationship
-drinks_parental_table <- table(data$Drinks_Per_Night, data$Parental_Relationship)
-
-# Calculate the percentages
-col_totals <- colSums(drinks_parental_table)
-drinks_parental_percent <- sweep(drinks_parental_table, 2, col_totals, FUN = "/") * 100
-
-# Print the frequency table and percentage table
-print(drinks_parental_table)
-print(drinks_parental_percent)
-
-# Calculate the average alcohol consumption by parental relationship
-mean_drinks_parental <- data %>%
-  group_by(Parental_Relationship) %>%
-  summarise(mean_drinks = mean(as.numeric(as.character(Drinks_Per_Night)), na.rm = TRUE))
-
-print(mean_drinks_parental)
-
-# QUESTION 6: Role of Sex in Alcohol Consumption and Academic Performance
-# 1. Distribution of sex within the sample
-sex_distribution <- table(data$Sex)
-print(sex_distribution)
-
-# 2. Distribution of alcohol consumption by sex
-drinks_sex_table <- table(data$Drinks_Per_Night, data$Sex)
-print(drinks_sex_table)
-
-# Calculate column totals
-col_totals <- colSums(drinks_sex_table)
-
-# Convert frequencies to percentages
-drinks_sex_percent <- sweep(drinks_sex_table, 2, col_totals, FUN = "/") * 100
-print(drinks_sex_percent)
-
-# 3. Mean GPA by sex
-gpa_sex <- data %>%
-  group_by(Sex) %>%
-  summarise(mean_GPA = mean(Matric_GPA, na.rm = TRUE), median_GPA = median(Matric_GPA, na.rm = TRUE))
-
-print(gpa_sex)
-
-
-############################
-### Statistical analysis ###
-############################
-
-### QUESTION 1: Frequency of Going Out and Academic Performance
-# Anova test
-anova_freq_perf <- aov(Matric_GPA ~ Party_Frequency, data = data)
-anova_freq_perf
-summary(anova_freq_perf)
-
-# check homogeneity
-anova_result_freq_perf_homo <- leveneTest(Matric_GPA ~ Party_Frequency, data = data)
-anova_result_freq_perf_homo
-# homogeneity assumption is okay (not violated)
-
-# Check normality
-# Extract the residuals
-residuals_freq_perf <- residuals(anova_freq_perf)
-
-# Plot a Q-Q plot
-qqnorm(residuals_freq_perf)
-qqline(residuals_freq_perf, col = "red")
-# you can see a straight line with some points deviating from the line
-
-# Perform a Shapiro-Wilk test for normality
-shapiro.test(residuals_freq_perf)
-# Normality assumption is violated. Check residual boxplot
-#check normality of residuals
-boxplot(residuals_freq_perf, 
-        main = "Boxplot of Residuals",
-        ylab = "Residuals",
-        boxwex = 0.5,  # Width of the boxes
-        notch = FALSE, # Don't show notches
-        horizontal = FALSE, # Vertical orientation
-        outline = TRUE, # Show outliers
-        col = "skyblue", # Boxplot color
-        border = "black" # Border color
-)
-
-# Normality assumptio is violated. Try removal of outliers
-# Calculate the lower and upper bounds for outliers using IQR (Interquartile Range) method
-Q1 <- quantile(residuals_freq_perf, 0.25)
-Q3 <- quantile(residuals_freq_perf, 0.75)
-IQR <- Q3 - Q1
-lower_bound <- Q1 - 1.5 * IQR
-upper_bound <- Q3 + 1.5 * IQR
-data_no_outliers <- data[!(residuals_freq_perf < lower_bound | residuals_freq_perf > upper_bound), ]
-
-# Print the dimensions of the original and filtered dataframes to see the difference
-cat("Original dataframe dimensions:", dim(data), "\n")
-cat("Filtered dataframe dimensions:", dim(data_no_outliers), "\n")
-# 7 outliers are removed
-
-# Anova test
-anova_freq_perf_no_outliers <- aov(Matric_GPA ~ Party_Frequency, data = data_no_outliers)
-anova_freq_perf_no_outliers
-summary(anova_freq_perf_no_outliers)
-
-# Check normality
-residuals_freq_perf_no_outliers <- residuals(anova_freq_perf_no_outliers)
-
-# Plot a Q-Q plot
-qqnorm(residuals_freq_perf_no_outliers)
-qqline(residuals_freq_perf_no_outliers, col = "red")
-# you can see a straight line with some points still deviating from the line
-
-# Perform a Shapiro-Wilk test for normality
-shapiro.test(residuals_freq_perf_no_outliers)
-# normality assumption is violated again. Try bootstrapping
-
-# Define a function to perform ANOVA and extract F-statistic
-# This function will be used to resample the data
-anova_func_boot <- function(data, indices) {
-  sampled_data <- data[indices, ]
-  #sampled_data <- na.omit(sampled_data) #try this with and without omitting the NAs
-  anova_result <- aov(Matric_GPA ~ Party_Frequency, data = sampled_data)
-  return(summary(anova_result)$fstatistic[1])
-}
-
-# Perform bootstrap resampling
-boot_result <- boot(data = data, statistic = anova_func_boot, R = 1000)  # R is the number of bootstrap samples
-
-# View the bootstrap results
-print(boot_result)
-
-# Calculate confidence intervals for the F-statistic
-boot_ci <- boot.ci(boot_result, type = "bca")  # bca method for bias-corrected and accelerated confidence intervals
-print(boot_ci)
-# bootstrapping does not work, even when omitting the NAs. Try transformation of the data
-
-# Transform the data
-data$Matric_GPA_log <- log(data$Matric_GPA)
-
-# Anova test
-anova_result_freq_perf_log <- aov(Matric_GPA_log ~ Party_Frequency, data = data)
-anova_result_freq_perf_log
-summary(anova_result_freq_perf_log)
-
-# Check normality
-residuals_freq_perf_log <- residuals(anova_result_freq_perf_log)
-
-# Plot a Q-Q plot
-qqnorm(residuals_freq_perf_log)
-qqline(residuals_freq_perf_log, col = "red")
-# you can see a straight line with some points still deviating from the line
-
-# Perform a Shapiro-Wilk test for normality
-shapiro.test(residuals_freq_perf_log)
-# normalityh assumption is still violated. Try Kruskal Wallis test
-kruskal_test_freq_perf <- kruskal.test(Matric_GPA ~ Party_Frequency, data = data)
-print(kruskal_test_Q1)
-# non-significant effect after taking into account the violated normality assumption
-
-### QUESTION 2: 
+# Perform Chi-square test
+chi_square_test <- chisq.test(contingency_table)
+print(chi_square_test) # p=0.201
 
 ### QUESTION 3: Amandine: The impact of alcohol consumption (Drinks_Per_Night) on failed modules (Failed_Modules)
 # Chi square test
 # Create contingency tables
 table_failed <- table(data$Drinks_Per_Night, data$Modules_Failed)
+
 
 # Perform Chi-Square Test for failed modules
 chi_square_failed <- chisq.test(table_failed) # This gives a warning message
@@ -275,7 +28,16 @@ chi_square_failed_sim <- chisq.test(table_failed, simulate.p.value = TRUE, B = 2
 print(table_failed)
 print(chi_square_failed_sim)
 
-### QUESTION 4: Amandine: The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
+### QUESTION 4: The impact of parental approval (Parents_Approve_Alcohol) on alcohol consumption (Drinks_Per Night)
+# Chi square test
+# Create contingency table
+contingency_table <- table(data$Parents_Approve_Alcohol, data$Drinks_Per_Night)
+
+#Perform Chi-square test
+chi_square_test <- chisq.test(contingency_table, simulate.p.value = TRUE, B = 10000) #Chi square test with Monte-Carlo-simulation because of warning message
+print(chi_square_test)
+
+### QUESTION 5: Amandine: The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
 # Chi square test
 # Create contingency tables
 table_drinks_parental <- table(data$Drinks_Per_Night, data$Parental_Relationship)
@@ -295,54 +57,8 @@ chi_square_test_sim <- chisq.test(table_drinks_parental, simulate.p.value = TRUE
 # Watch results
 print(chi_square_test_sim)
 
-### QUESTION 5: 
+### QUESTION 5: The impact of going out (Party_Frequency) on academic performance (Matric_GPA)
 
-### QUESTION 6: The impact of alcohol consumption (Drinks_Per_Night) on academic performance (Matric_GPA) in males and females (Sex)
-# Anova test
-anova_result_alc_perf <- aov(Matric_GPA ~ Drinks_Per_Night * Sex, data = data)
-anova_result_alc_perf
-summary(anova_result_alc_perf)
+### QUESTION 6: The impact of alcohol consumption (Drinks_Per_Night) on academic performance (Matric_GPA)
 
-# check homogeneity
-anova_result_alc_perf_homo <- leveneTest(Matric_GPA ~ Drinks_Per_Night * Sex, data = data)
-anova_result_alc_perf_homo
-# homogeneity assumption is violated. First check normality to choose the best fitting approach
 
-# Check normality
-# Extract the residuals
-residuals_alc_perf <- residuals(anova_result_alc_perf)
-
-# Perform the Shapiro_Wilk test for normality
-shapiro.test(residuals_alc_perf)
-#normality assumption is violated
-
-# Normality plot
-qqnorm(residuals_alc_perf)
-qqline(residuals_alc_perf, col = "red")
-
-# Perform a Kruskal Wallis test ot account for the violated homogeneity and normality assumptions. 
-# First, make a new variable to include the interaction effect
-data$Group_KW <- interaction(data$Drinks_Per_Night, data$Sex)
-kruskal_test_alc_perf <- kruskal.test(Matric_GPA ~ Group_KW, data = data)
-print(kruskal_test_alc_perf)
-# No significant (interaction) effect
-
-# Create the plot, including the sexes
-Plot_alc_perf_sex <- ggplot(data, aes(x = Drinks_Per_Night, y = as.numeric(Matric_GPA), fill = as.factor(Sex))) +
-  geom_violin(trim = TRUE) +
-  scale_x_discrete(labels = c("0", "1-3", "3-5", "5-8", "8+")) +
-  scale_fill_manual(values = c("0" = "green", "1" = "purple"),
-                    labels = c("0" = "Male", "1" = "Female")) +
-  labs(title = "",
-       x = "Drinks per night",
-       y = "Matric GPA",
-       fill = "Sex") +
-  theme_minimal() +
-  theme(panel.grid.major = element_blank(), 
-        panel.grid.minor = element_blank(),
-        text = element_text(size = 14),  # General text size
-        axis.title = element_text(size = 16),  # Axis titles
-        axis.text = element_text(size = 14),  # Axis text
-        legend.title = element_text(size = 16),  # Legend title
-        legend.text = element_text(size = 14))  # Legend text
-plot_alc_perf_sex
