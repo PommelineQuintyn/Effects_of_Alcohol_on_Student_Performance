@@ -3,19 +3,15 @@
 
 ### PREPARE THE DATASET TO PERFORM THE ANALYSES ###
 # Note that we added the preprocessed dataframe (data.rds) in the GitHub repository. You can skip this script and download it to perform the analyses without completing this script. 
-## Install and load all packages
-install.packages("car")     # For Anova function
-install.packages("ggplot2") # For plotting
+## Install and load packages needed for the preprocessing of the data
 install.packages("tidyverse")
-library(car)
-library(ggplot2)
 library(tidyverse)
 
-## Load dataset 
+## Load CSV file which can be retrieved on the site. 
 data <- read.csv("/Users/marievandewalle/Documents/PSYCHOLOGIE/Master/ma 2/CSAED/Stats-survey.csv") #personalize working directory
 
 ## Preprocess the data
-# rename columns
+# rename columns to get a better overview of the variables. 
 data <- data %>%
   rename(
     Sex = Your.Sex.,
@@ -36,42 +32,40 @@ data <- data %>%
     Parental_Relationship = How.strong.is.your.relationship.with.your.parent.s.
   )
 
-# add column with subject ID
-data$subjID <-  1:nrow(data)
-
 # remove columns that are irrelevant for the purposes of this study
 data <- subset(data, select = -Timestamp)
 data <- subset(data, select = -Accommodation_Status)
 data <- subset(data, select = -Scholarship_Status)
 data <- subset(data, select = -Year_2023_GPA)
+data <- subset(data, select = -Academic_Year)
+data <- subset(data, select = -Faculty)
+data <- subset(data, select = -Monthly_Allowance)
+data <- subset(data, select = -Study_Hours_Per_Week)
+data <- subset(data, select = -Classes_Missed_Due_To_Alcohol)
 
-# remove 2 blank lines
+# remove 2 empty lines
 data <- data[-c(225, 233),]
 
+# add column with subject ID
+data$subjID <-  1:nrow(data)
+
 # recode the variables, based on the proposed levels which can be found on the website (link at top of this script)
+# it's possible you get a warning message for Modules_Failed, In_Romantic_Relationship, Parents_Approve_Alcohol and Parental_Relationship
+# these warning occur because of missing data and are replaced by NAs. 
 data <- mutate(data, Sex = recode(Sex, "Female" = 1, "Male" = 0))
-data <- mutate(data, Academic_Year = recode(Academic_Year, "1st Year" = 0, "2nd Year" = 1, "3rd Year" = 2, "4th Year" = 3, "Postgraduate" = 4))
 data <- mutate(data, Party_Frequency = recode(Party_Frequency, "0" = 0, "1" = 1, "2" = 2, "3" = 3, "4+" = 4, "Only weekends" = 5))
-data <- mutate(data, Faculty = recode(Faculty, "AgriSciences" = 0, "Arts & Social Sciences" = 1, "Economic & Management Sciences" = 2, "Education" = 3, "Engineering" = 4, "Law" = 5, "Medicine & Health Sciences" = 6, "Military Science" = 7, "Science" = 8, "Theology" = 9))
-data <- mutate(data, Monthly_Allowance = recode(Monthly_Allowance, "R 4001- R 5000" = 0, "R 5001- R 6000" = 1, "R 6001- R 7000" = 2, "R 7001- R 8000" = 3, "R 8000+" = 4))
-data <- mutate(data, Study_Hours_Per_Week = recode(Study_Hours_Per_Week, "0" = 0, "1-3" = 1, "3-5" = 2, "5-8" = 3, "8+" = 4))
 data <- mutate(data, Drinks_Per_Night = recode(Drinks_Per_Night, "0" = 0, "1-3" = 1, "3-5" = 2, "5-8" = 3, "8+" = 4))
-data <- mutate(data, Classes_Missed_Due_To_Alcohol = recode(Classes_Missed_Due_To_Alcohol, "0" = 0, "1" = 1, "2" = 2, "3" = 3, "4+" = 4))
 data <- mutate(data, Modules_Failed = recode(Modules_Failed, "0" = 0, "1" = 1, "2" = 2, "3" = 3, "4+" = 4))
 data <- mutate(data, In_Romantic_Relationship = recode(In_Romantic_Relationship, "Yes" = 0, "No" = 1))
 data <- mutate(data, Parents_Approve_Alcohol = recode(Parents_Approve_Alcohol, "Yes" = 0, "No" = 1))
 data <- mutate(data, Parental_Relationship = recode(Parental_Relationship, "Very close" = 0, "Close" = 1, "Fair" = 2, "Distant" = 3))
 
+
 # set type of variables
 data$Sex <- as.factor(data$Sex)
-data$Matric_GPA <- as.numeric(data$Matric_GPA) # this is the only numeric variable
+data$Matric_GPA <- as.numeric(data$Matric_GPA)
 data$Party_Frequency <- as.factor(data$Party_Frequency)
-data$Academic_Year <- as.factor(data$Academic_Year)
-data$Faculty <- as.factor(data$Faculty)
-data$Monthly_Allowance <- as.factor(data$Monthly_Allowance)
-data$Study_Hours_Per_Week <- as.factor(data$Study_Hours_Per_Week) 
 data$Drinks_Per_Night <- as.factor(data$Drinks_Per_Night)
-data$Classes_Missed_Due_To_Alcohol <- as.factor(data$Classes_Missed_Due_To_Alcohol)
 data$Modules_Failed <- as.factor(data$Modules_Failed)
 data$In_Romantic_Relationship <- as.factor(data$In_Romantic_Relationship)
 data$Parents_Approve_Alcohol <- as.factor(data$Parents_Approve_Alcohol)
