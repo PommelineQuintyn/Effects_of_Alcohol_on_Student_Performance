@@ -148,7 +148,7 @@ print(gpa_sex)
 ### Statistical analysis ###
 ############################
 
-### QUESTION 1: Frequency of Going Out and Academic Performance
+### QUESTION 1: Frequency of Going Out and Academic Performance (Marie)
 # Anova test
 anova_freq_perf <- aov(Matric_GPA ~ Party_Frequency, data = data)
 anova_freq_perf
@@ -297,7 +297,7 @@ print(chi_square_test_sim)
 
 ### QUESTION 5: Parental Relationship and Alcohol Consumption
 
-### QUESTION 6: The impact of alcohol consumption (Drinks_Per_Night) on academic performance (Matric_GPA) in males and females (Sex)
+### QUESTION 6: The impact of alcohol consumption (Drinks_Per_Night) on academic performance (Matric_GPA) in males and females (Sex) (Marie)
 # Anova test
 anova_result_alc_perf <- aov(Matric_GPA ~ Drinks_Per_Night * Sex, data = data)
 anova_result_alc_perf
