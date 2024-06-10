@@ -275,8 +275,6 @@ chi_square_failed_sim <- chisq.test(table_failed, simulate.p.value = TRUE, B = 2
 print(table_failed)
 print(chi_square_failed_sim)
 
-
-
 ### QUESTION 4: : The impact of parental relationship (Parental_Relationship) on alcohol consumption (Drinks_Per Night)
 # Chi square test
 # Create contingency tables
